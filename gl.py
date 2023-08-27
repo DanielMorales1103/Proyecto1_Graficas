@@ -36,6 +36,8 @@ class Renderer(object):
 
         self.glColor(1,1,1)
 
+        self.background= None
+
         self.objects = []
 
         self.vertexShader = None
@@ -52,6 +54,24 @@ class Renderer(object):
 
         self.directionalLight = (0,-0.5,-0.5)
 
+    def glBackgroundTexture(self, filename):
+        self.background= Texture(filename)
+    
+    def glClearBackground(self):
+        self.glClear()
+
+        if self.background:
+            for x in range(self.vpX, self.vpX + self.vpWidth + 1):
+                for y in range(self.vpY, self.vpY + self.vpHeight + 1):
+
+                    u = (x - self.vpX) / self.vpWidth
+                    v = (y - self.vpY) / self.vpHeight
+
+                    texColor = self.background.getColor(u,v)
+
+                    if texColor:
+                        self.glPoint(x,y,color(texColor[0],texColor[1],texColor[2]))
+    
     def glClearColor(self, r, g, b):
         # Establecer el color de fondo
         self.clearColor = color(r,g,b)
@@ -61,13 +81,9 @@ class Renderer(object):
         self.currColor = color(r,g,b)
 
     def glClear(self):
-        # Se crea la tabla de pixeles del tama�o width*height.
-        # Se le asigna a cada pixel el color de fondo.
         self.pixels = [[self.clearColor for y in range(self.height)]
                        for x in range(self.width)]
 
-        # Se crea otra tabla para el Z Buffer. Aqu� se guarda la profundidad
-        # de cada pixel, con el valor m�ximo de profundidad inicial.
         self.zbuffer = [[float('inf') for y in range(self.height)]
                        for x in range(self.width)]
 
