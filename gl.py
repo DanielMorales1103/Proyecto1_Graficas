@@ -24,13 +24,10 @@ class Model(object):
         self.scale = scale
 
         self.texture = None
-        self.normalMap = None
 
     def LoadTexture(self, textureName):
         self.texture = Texture(textureName)
-    
-    def LoadNormalMap(self, textureName):
-        self.normalMap = Texture(textureName)
+ 
 
 class Renderer(object):
     def __init__(self, width, height):
@@ -52,7 +49,6 @@ class Renderer(object):
         self.primitiveType = TRIANGLES
 
         self.activeTexture = None
-        self.activeNormalMap= None
 
         self.activeModelMatrix = None
 
@@ -149,8 +145,7 @@ class Renderer(object):
                                                              normals= normals,
                                                              dLight= self.directionalLight,
                                                              bCoords= bCoords,
-                                                             modelMatrix= self.activeModelMatrix,
-                                                             normalMap = self.activeNormalMap)
+                                                             modelMatrix= self.activeModelMatrix)
                                 
 
                                 self.glPoint(x, y, color(colorP[0], colorP[1], colorP[2]))
@@ -350,12 +345,10 @@ class Renderer(object):
 
                 limit += 1
 
-    def glLoadModel(self, filename, textureName, translate = (0,0,0), rotate = (0,0,0), scale = (1,1,1), normalMap=None):
+    def glLoadModel(self, filename, textureName, translate = (0,0,0), rotate = (0,0,0), scale = (1,1,1)):
         # Se crea el modelo y le asignamos su textura
         model = Model(filename, translate, rotate, scale)
         model.LoadTexture(textureName)
-        if normalMap != None:
-            model.LoadNormalMap(normalMap)
         # Se agrega el modelo al listado de objetos
         self.objects.append( model )
 
@@ -372,7 +365,6 @@ class Renderer(object):
             self.activeTexture = model.texture
             mMat = self.glModelMatrix(model.translate, model.rotate, model.scale)
             self.activeModelMatrix = mMat
-            self.activeNormalMap = model.normalMap
 
             # Para cada cara del modelo
             for face in model.faces:

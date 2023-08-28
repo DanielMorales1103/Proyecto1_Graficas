@@ -170,7 +170,7 @@ def OutlineShader(**kwargs):
 
     threshold_angle = 0.8 
     if angle_A > threshold_angle or angle_B > threshold_angle or angle_C > threshold_angle:
-        color = [0, 1, 0]  
+        color = [0.04, 0.03, 0.37]  
     else:
         if texture != None:
             tU = u * tA[0] + v * tB[0] + w * tC[0]
@@ -178,7 +178,7 @@ def OutlineShader(**kwargs):
             textureColor = texture.getColor(tU, tV)
             color = textureColor
         else:
-            color = [1, 1, 1]  
+            color = [0, 0, 0.1]  
 
     return color
 
@@ -369,52 +369,4 @@ def snakeShader(**kwargs):
     if intensity > 0:
         return r, g, b
     else:
-        return [0, 0, 0]    
-    
-def NormalMapShader(**kwargs):
-    texture= kwargs["texture"]
-    tA, tB, tC= kwargs["texCoords"]
-    nA, nB, nC= kwargs["normals"]
-    dLight = kwargs["dLight"]
-    u, v, w= kwargs["bCoords"]
-    modelMatrix= kwargs["modelMatrix"]
-    normalMap = kwargs["normalMap"]
-
-
-    b= 1.0
-    g= 1.0
-    r= 1.0
-
-    if texture != None:
-        tU= u * tA[0] + v * tB[0] + w * tC[0]
-        tV= u * tA[1] + v * tB[1] + w * tC[1]
-        
-        textureColor = texture.getColor(tU, tV)    
-        b *= textureColor[2]
-        g *= textureColor[1]
-        r *= textureColor[0]
-
-    normal= [u * nA[0] + v * nB[0] + w * nC[0],
-                u * nA[1] + v * nB[1] + w * nC[1],
-                u * nA[2] + v * nB[2] + w * nC[2],
-                0]
-
-    normal = lb.multimatrixvec(modelMatrix, normal)
-    normal = [normal[0], normal[1], normal[2]]
-
-    dLight =(-dLight[0], -dLight[1], -dLight[2])
-    intensity= lb.dot_product(normal, dLight)
-
-    b *= intensity
-    g *= intensity
-    r *= intensity
-
-    b = min(b, 1.0)
-    g = min(g, 1.0)
-    r = min(r, 1.0)
-
-    if intensity > 0:
-        return r, g, b
-
-    else:
-        return [0,0,0]
+        return [0, 0, 0]
