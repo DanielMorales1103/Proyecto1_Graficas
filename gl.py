@@ -23,8 +23,14 @@ class Model(object):
         self.rotate = rotate
         self.scale = scale
 
+        self.texture = None
+        self.normalMap = None
+
     def LoadTexture(self, textureName):
         self.texture = Texture(textureName)
+    
+    def LoadNormalMap(self, textureName):
+        self.normalMap = Texture(textureName)
 
 class Renderer(object):
     def __init__(self, width, height):
@@ -46,6 +52,9 @@ class Renderer(object):
         self.primitiveType = TRIANGLES
 
         self.activeTexture = None
+        self.activeNormalMap= None
+
+        self.activeModelMatrix = None
 
         self.glViewport(0, 0, self.width, self.height)
 
@@ -121,7 +130,6 @@ class Renderer(object):
                     if bCoords != None:
 
                         u, v, w = bCoords
-
                         # Se calcula el valor Z para este punto usando las coordenadas baric�ntricas
                         z = u * A[2] + v * B[2] + w * C[2]
 
@@ -135,11 +143,15 @@ class Renderer(object):
                             # Sino, usar el color preestablecido.
                             if self.fragmentShader != None:
                                 # Mandar los par�metros necesarios al shader
+                                
                                 colorP = self.fragmentShader(texture = self.activeTexture,
                                                              texCoords= texCoords,
                                                              normals= normals,
                                                              dLight= self.directionalLight,
-                                                             bCoords= bCoords)
+                                                             bCoords= bCoords,
+                                                             modelMatrix= self.activeModelMatrix,
+                                                             normalMap = self.activeNormalMap)
+                                
 
                                 self.glPoint(x, y, color(colorP[0], colorP[1], colorP[2]))
                                 
@@ -338,11 +350,12 @@ class Renderer(object):
 
                 limit += 1
 
-    def glLoadModel(self, filename, textureName, translate = (0,0,0), rotate = (0,0,0), scale = (1,1,1)):
+    def glLoadModel(self, filename, textureName, translate = (0,0,0), rotate = (0,0,0), scale = (1,1,1), normalMap=None):
         # Se crea el modelo y le asignamos su textura
         model = Model(filename, translate, rotate, scale)
         model.LoadTexture(textureName)
-
+        if normalMap != None:
+            model.LoadNormalMap(normalMap)
         # Se agrega el modelo al listado de objetos
         self.objects.append( model )
 
@@ -358,6 +371,8 @@ class Renderer(object):
             # Establecemos la textura y la matriz del modelo
             self.activeTexture = model.texture
             mMat = self.glModelMatrix(model.translate, model.rotate, model.scale)
+            self.activeModelMatrix = mMat
+            self.activeNormalMap = model.normalMap
 
             # Para cada cara del modelo
             for face in model.faces:
