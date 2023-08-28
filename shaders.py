@@ -1,4 +1,4 @@
-import numpy as np
+
 import libreria as lb
 import random
 

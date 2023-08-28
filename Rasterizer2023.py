@@ -96,4 +96,4 @@ rend.glLoadModel(filename = "models/DeadTree4.obj",
                  scale = (0.3,0.3,0.3)) 
 rend.glRender()
 
-rend.glFinish("photoshoot/pruebas.bmp")
+rend.glFinish("photoshoot/imageFinal.bmp")
